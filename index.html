@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RevForge IDE V15 — AI-Powered Python IDE for Windows</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --bg2: #111111;
+    --cyan: #ffffff;
+    --gold: #cccccc;
+    --blue: #888888;
+    --green: #ffffff;
+    --red: #aaaaaa;
+    --text: #dddddd;
+    --muted: #666666;
+    --card: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.1);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Grid bg */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top:0; left:0; right:0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 48px;
+    background: rgba(4,8,16,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .nav-logo .rf-badge {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, #fff, #888);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #fff;
+    letter-spacing: -1px;
+  }
+
+  .nav-logo span {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  .nav-logo span em {
+    color: var(--cyan);
+    font-style: normal;
+  }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 32px;
+  }
+
+  nav ul a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  nav ul a:hover { color: var(--cyan); }
+
+  .nav-cta {
+    background: linear-gradient(90deg, #fff, #888);
+    color: #000 !important;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 700 !important;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    z-index: 1;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cyan);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .hero-badge::before {
+    content:'';
+    width:8px; height:8px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100%{ opacity:1; } 50%{ opacity:0.4; }
+  }
+
+  .hero h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -1px;
+    color: #fff;
+    margin-bottom: 8px;
+    animation: fadeDown 0.7s ease 0.1s both;
+  }
+
+  .hero h1 .v15 {
+    color: var(--cyan);
+    text-shadow: 0 0 40px rgba(0,212,255,0.4);
+  }
+
+  .hero-sub {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(18px, 3vw, 28px);
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    animation: fadeDown 0.7s ease 0.2s both;
+  }
+
+  .hero-desc {
+    max-width: 580px;
+    margin: 0 auto 40px;
+    font-size: 18px;
+    color: var(--muted);
+    line-height: 1.7;
+    animation: fadeDown 0.7s ease 0.3s both;
+  }
+
+  .hero-desc strong { color: var(--text); }
+
+  .hero-cta-group {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeDown 0.7s ease 0.4s both;
+    margin-bottom: 56px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(90deg, #ffffff, #aaaaaa);
+    color: #000;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 14px 36px;
+    border-radius: 8px;
+    text-decoration: none;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    box-shadow: 0 0 30px rgba(255,255,255,0.15);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 50px rgba(255,255,255,0.25);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    color: var(--cyan);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 14px 36px;
+    border-radius: 8px;
+    text-decoration: none;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid rgba(255,255,255,0.25);
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover {
+    border-color: #fff;
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* stats */
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeDown 0.7s ease 0.5s both;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--cyan);
+    display: block;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  @keyframes fadeDown {
+    from { opacity:0; transform: translateY(-20px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* SECTION BASE */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 96px 24px;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--cyan);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .section-desc {
+    font-size: 17px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 560px;
+  }
+
+  /* WHY SECTION */
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-top: 56px;
+  }
+
+  .why-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .why-card::before {
+    content:'';
+    position:absolute;
+    top:0; left:0; right:0;
+    height:2px;
+    background: linear-gradient(90deg, var(--cyan), var(--blue));
+    opacity:0;
+    transition: opacity 0.3s;
+  }
+
+  .why-card:hover {
+    border-color: rgba(255,255,255,0.25);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  }
+
+  .why-card:hover::before { opacity:1; }
+
+  .why-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .why-card h3 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .why-card p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* PROTECTION SUITE */
+  .protection {
+    background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .protection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 56px;
+  }
+
+  .protect-card {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 24px 20px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .protect-card:hover {
+    border-color: #fff;
+    box-shadow: 0 0 20px rgba(255,255,255,0.08);
+  }
+
+  .protect-card .protect-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .protect-card h4 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  /* AI FEATURES */
+  .ai-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 48px;
+  }
+
+  .ai-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+
+  .ai-item:hover {
+    border-color: rgba(0,212,255,0.25);
+    background: rgba(0,212,255,0.06);
+  }
+
+  .ai-item .check {
+    color: var(--green);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .ai-item .pro-tag {
+    margin-left: auto;
+    background: rgba(240,165,0,0.12);
+    color: var(--gold);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  /* FEATURES GRID */
+  .features-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 56px;
+  }
+
+  .feat-category {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .feat-category h4 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cyan);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .feat-category ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .feat-category ul li {
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .feat-category ul li::before {
+    content: '▸';
+    color: var(--muted);
+    font-size: 10px;
+  }
+
+  /* PRICING */
+  .pricing-section {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pricing-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 40px 0;
+  }
+
+  .toggle-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .toggle-label.active { color: var(--cyan); }
+
+  .toggle-switch {
+    width: 48px;
+    height: 26px;
+    background: rgba(0,212,255,0.15);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .toggle-switch.on { background: rgba(0,212,255,0.3); }
+
+  .toggle-knob {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: var(--cyan);
+    border-radius: 50%;
+    transition: transform 0.3s;
+  }
+
+  .toggle-switch.on .toggle-knob { transform: translateX(22px); }
+
+  .save-badge {
+    background: rgba(0,255,136,0.12);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 1px;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 16px;
+  }
+
+  .price-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 32px;
+    position: relative;
+    transition: all 0.3s;
+  }
+
+  .price-card.featured {
+    border-color: #fff;
+    background: rgba(255,255,255,0.04);
+    box-shadow: 0 0 40px rgba(255,255,255,0.07);
+  }
+
+  .price-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .featured-tag {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, #fff, #999);
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 16px;
+    border-radius: 999px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .plan-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .plan-price {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--cyan);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .plan-price span {
+    font-size: 20px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .plan-period {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .plan-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .plan-features li {
+    font-size: 14px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .plan-features li .ok { color: var(--green); }
+  .plan-features li .no { color: var(--muted); }
+
+  .plan-btn {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .plan-btn.primary {
+    background: linear-gradient(90deg, #fff, #aaa);
+    color: #000;
+    box-shadow: 0 0 20px rgba(255,255,255,0.1);
+  }
+
+  .plan-btn.primary:hover {
+    box-shadow: 0 0 40px rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+  }
+
+  .plan-btn.outline {
+    background: transparent;
+    color: var(--cyan);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .plan-btn.outline:hover {
+    border-color: #fff;
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* HOW IT WORKS */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-top: 56px;
+    position: relative;
+  }
+
+  .step {
+    text-align: center;
+    padding: 32px 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .step-num {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #fff, #888);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 auto 20px;
+  }
+
+  .step h3 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .step p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* AI MODELS */
+  .models-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .model-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  /* SYSTEM REQUIREMENTS */
+  .req-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 40px;
+    max-width: 480px;
+  }
+
+  .req-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  .req-item .req-icon { font-size: 22px; }
+
+  /* FINAL CTA */
+  .final-cta {
+    text-align: center;
+    padding: 120px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .final-cta::before {
+    content:'';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.06) 0%, transparent 70%);
+  }
+
+  .final-cta h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .final-cta p {
+    font-size: 18px;
+    color: var(--muted);
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .final-cta .cta-group {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 24px;
+    text-align: center;
+    position: relative;
+    z-index:1;
+  }
+
+  .footer-logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .footer-logo em { color: var(--cyan); font-style: normal; }
+
+  footer p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  footer .footer-links {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  footer .footer-links a {
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  footer .footer-links a:hover { color: var(--cyan); }
+
+  /* divider */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0 24px;
+  }
+
+  /* responsive */
+  @media(max-width:768px){
+    nav { padding: 14px 20px; }
+    nav ul { display: none; }
+    .hero { padding: 100px 20px 60px; }
+    .hero-stats { gap: 28px; }
+  }
+
+  /* scroll animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="rf-badge">RF</div>
+    <span>RevForge <em>IDE</em></span>
+  </div>
+  <ul>
+    <li><a href="#why">Why RF</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="https://mdrabiul.gumroad.com/l/uzrjim" class="nav-cta">Get Now →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div>
+    <div class="hero-badge">🟢 V15 Now Live — 430+ Features</div>
+    <h1>RevForge <span class="v15">IDE V15</span></h1>
+    <div class="hero-sub">AI-Powered Python IDE for Windows</div>
+    <p class="hero-desc">
+      <strong>Zero installation. Just double-click and code.</strong><br>
+      A fully self-contained Python development environment — packed in a single <code style="color:var(--gold); background:rgba(240,165,0,0.1); padding:2px 6px; border-radius:4px;">.bat</code> file.
+    </p>
+    <div class="hero-cta-group">
+      <a href="https://mdrabiul.gumroad.com/l/uzrjim" class="btn-primary">⚡ Get Instant Access</a>
+      <a href="#features" class="btn-secondary">Explore Features →</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num">430+</span>
+        <div class="stat-label">Built-in Features</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num">100%</span>
+        <div class="stat-label">Offline Core</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num">0</span>
+        <div class="stat-label">Installation Steps</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num">4</span>
+        <div class="stat-label">AI Models Supported</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UNSPLASH SHOWCASE IMAGE -->
+<div style="position:relative; z-index:1; width:100%; max-width:1100px; margin:0 auto 0; padding:0 24px 80px;">
+  <div style="position:relative; border-radius:16px; overflow:hidden; border:1px solid rgba(0,212,255,0.15); box-shadow: 0 0 60px rgba(0,87,255,0.15);">
+    <img 
+      src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&q=80&fit=crop" 
+      alt="Developer coding — RevForge IDE" 
+      style="width:100%; height:400px; object-fit:cover; display:block; opacity:0.75;"
+    />
+    <!-- overlay -->
+    <div style="position:absolute; inset:0; background:linear-gradient(to right, rgba(4,8,16,0.85) 30%, transparent 100%);"></div>
+    <!-- text on image -->
+    <div style="position:absolute; top:50%; left:48px; transform:translateY(-50%);">
+      <p style="font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--cyan); letter-spacing:3px; text-transform:uppercase; margin-bottom:12px;">// The IDE You Deserve</p>
+      <h3 style="font-family:'Rajdhani',sans-serif; font-size:clamp(28px,4vw,48px); font-weight:700; color:#fff; line-height:1.1; margin-bottom:16px;">Code Faster.<br><span style="color:var(--cyan)">Ship Smarter.</span></h3>
+      <a href="https://mdrabiul.gumroad.com/l/uzrjim" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(90deg,#fff,#aaa); color:#000; font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; padding:12px 28px; border-radius:8px; text-decoration:none; letter-spacing:1px; text-transform:uppercase;">⚡ Get V15 Now</a>
+    </div>
+    <!-- photo credit -->
+    <div style="position:absolute; bottom:10px; right:14px; font-size:10px; color:rgba(255,255,255,0.3); font-family:'Share Tech Mono',monospace;">Photo: Unsplash</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- WHY -->
+<section id="why">
+  <div class="container">
+    <span class="section-label">// Why RevForge IDE</span>
+    <h2 class="section-title">Built for <span style="color:var(--cyan)">Serious</span> Python Devs</h2>
+    <p class="section-desc">No bloat. No setup wizards. No BS. Just a powerful, AI-equipped IDE that launches instantly.</p>
+
+    <div class="why-grid reveal">
+      <div class="why-card">
+        <span class="why-icon">📁</span>
+        <h3>Single File. Full IDE.</h3>
+        <p>Runs from one <code style="color:var(--gold)">.bat</code> file. No installer, no extra folders, no configuration. Double-click and code.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">📡</span>
+        <h3>100% Offline Core</h3>
+        <p>All core features work completely offline. Internet only needed for AI integrations — your code stays private.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🤖</span>
+        <h3>BYOK — Your AI, Your Choice</h3>
+        <p>Bring Your Own API Key. Connect GPT-4, Claude, Gemini, or Ollama — you own the AI stack.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🔒</span>
+        <h3>Machine-Bound Security</h3>
+        <p>SHA-256 hardware lock + PyArmor obfuscation + 4-layer anti-tamper. Your IDE, your machine, your code.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">⚡</span>
+        <h3>Instant Launch</h3>
+        <p>No setup wizard. No loading screen. Double-click → your full professional IDE is ready in seconds.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🛡️</span>
+        <h3>EXE Export & Protection</h3>
+        <p>Build protected EXE files via Nuitka directly from inside the IDE. Ship your Python apps with confidence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UNSPLASH BANNER 2 — Security/Protection -->
+<div style="position:relative; z-index:1; width:100%; overflow:hidden; height:280px;">
+  <img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=1400&q=80&fit=crop" alt="Code Security" style="width:100%; height:280px; object-fit:cover; display:block; opacity:0.4; filter:grayscale(100%);"/>
+  <div style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(8,8,8,0.5), rgba(8,8,8,0.7));"></div>
+  <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center;">
+    <div>
+      <p style="font-family:'Share Tech Mono',monospace; font-size:11px; color:#aaa; letter-spacing:3px; text-transform:uppercase; margin-bottom:10px;">// NEW IN V15</p>
+      <h3 style="font-family:'Rajdhani',sans-serif; font-size:clamp(28px,5vw,56px); font-weight:700; color:#fff; line-height:1;">Commercial <span style="color:#fff; text-decoration:underline; text-underline-offset:6px;">Protection</span> Suite</h3>
+      <p style="color:#888; font-size:15px; margin-top:12px;">4-Layer Anti-Tamper · Machine-Bound License · PyArmor Obfuscation</p>
+    </div>
+  </div>
+  <div style="position:absolute; bottom:10px; right:14px; font-size:10px; color:rgba(255,255,255,0.2); font-family:'Share Tech Mono',monospace;">Photo: Unsplash</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROTECTION SUITE -->
+<section class="protection">
+  <div class="container">
+    <span class="section-label">// New in V15</span>
+    <h2 class="section-title">Commercial <span style="color:var(--blue)">Protection</span> Suite</h2>
+    <p class="section-desc">Enterprise-grade code protection tools built directly into your IDE.</p>
+
+    <div class="protection-grid reveal">
+      <div class="protect-card">
+        <span class="protect-icon">🛡️</span>
+        <h4>4-Layer Anti-Tamper Protection System</h4>
+      </div>
+      <div class="protect-card">
+        <span class="protect-icon">🔐</span>
+        <h4>Machine-Bound License SHA-256 Hardware Lock</h4>
+      </div>
+      <div class="protect-card">
+        <span class="protect-icon">🔑</span>
+        <h4>Hashed License Key Validation</h4>
+      </div>
+      <div class="protect-card">
+        <span class="protect-icon">🎭</span>
+        <h4>PyArmor Obfuscation — One-Click Source Protection</h4>
+      </div>
+      <div class="protect-card">
+        <span class="protect-icon">📦</span>
+        <h4>Protected EXE Export via Nuitka</h4>
+      </div>
+      <div class="protect-card">
+        <span class="protect-icon">📊</span>
+        <h4>Protection Status Dashboard + Machine ID Display</h4>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- AI FEATURES -->
+<section id="features">
+  <div class="container">
+    <span class="section-label">// AI Features</span>
+    <h2 class="section-title">AI That Actually <span style="color:var(--cyan)">Helps You Code</span></h2>
+    <p class="section-desc">Not just autocomplete. A full AI co-pilot wired into every part of your workflow.</p>
+
+    <div class="models-row reveal">
+      <div class="model-chip">🟢 GPT-4</div>
+      <div class="model-chip">🟠 Claude</div>
+      <div class="model-chip">🔵 Gemini</div>
+      <div class="model-chip">⚫ Ollama</div>
+      <div style="color:var(--muted); font-size:13px; padding:10px 0;">← Switch any time from inside the IDE</div>
+    </div>
+
+    <div class="ai-list reveal" style="margin-top:32px;">
+      <div class="ai-item"><span class="check">✓</span> Live AI Autocomplete while typing <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Bug Predictor — highlights risky lines <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Code Review with full analysis + score <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Explain Code <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Generate Unit Tests <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Refactor Suggestion — side-by-side view <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Simplify Code <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Variable Namer <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Docstring Generator <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Auto-Fix Last Error <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Commit Message Generator <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI README Generator <span class="pro-tag">PRO</span></div>
+      <div class="ai-item"><span class="check">✓</span> AI Python 2→3 Converter</div>
+      <div class="ai-item"><span class="check">✓</span> Hybrid AI Switcher (GPT-4 / Claude / Gemini / Ollama)</div>
+      <div class="ai-item"><span class="check">✓</span> Context-Aware AI Chat with your open file</div>
+      <div class="ai-item"><span class="check">✓</span> BYOK — Bring Your Own API Key</div>
+    </div>
+  </div>
+</section>
+
+<!-- UNSPLASH BANNER 3 — AI/Tech -->
+<div style="position:relative; z-index:1; width:100%; overflow:hidden; height:260px;">
+  <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1400&q=80&fit=crop" alt="AI Technology" style="width:100%; height:260px; object-fit:cover; display:block; opacity:0.35; filter:grayscale(100%);"/>
+  <div style="position:absolute; inset:0; background:linear-gradient(to right, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.4) 60%, rgba(8,8,8,0.85) 100%);"></div>
+  <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:flex-start; padding:0 60px;">
+    <div>
+      <p style="font-family:'Share Tech Mono',monospace; font-size:11px; color:#999; letter-spacing:3px; text-transform:uppercase; margin-bottom:10px;">// BYOK — Bring Your Own Key</p>
+      <h3 style="font-family:'Rajdhani',sans-serif; font-size:clamp(24px,4vw,48px); font-weight:700; color:#fff; line-height:1.1; max-width:480px;">GPT-4 · Claude · Gemini · Ollama<br><span style="color:#ccc; font-size:0.7em; font-weight:400;">You choose the AI. You own the key.</span></h3>
+    </div>
+  </div>
+  <div style="position:absolute; bottom:10px; right:14px; font-size:10px; color:rgba(255,255,255,0.2); font-family:'Share Tech Mono',monospace;">Photo: Unsplash</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 430+ FEATURES -->
+<section style="background: var(--bg2);">
+  <div class="container">
+    <span class="section-label">// 430+ Built-In Features</span>
+    <h2 class="section-title">Everything You Need. <span style="color:var(--gold)">Nothing You Don't.</span></h2>
+
+    <div class="features-categories reveal">
+      <div class="feat-category">
+        <h4>✏️ Editor & UI</h4>
+        <ul>
+          <li>7 Color Scheme Presets + Custom Theme Creator</li>
+          <li>Font Customizer, Cursor Style, Tab Color Coder</li>
+          <li>Zen Mode, Split View, Welcome Screen</li>
+          <li>Multi-Cursor Insert, Multi-Replace</li>
+          <li>Snippet Manager, Macro Recorder & Player</li>
+          <li>Command Palette (80+ commands)</li>
+        </ul>
+      </div>
+      <div class="feat-category">
+        <h4>🔍 Code Quality</h4>
+        <ul>
+          <li>Linter (pyflakes + AST), Type Checker (mypy)</li>
+          <li>Code Coverage, Code Timer</li>
+          <li>Dead Code Finder, Dependency Security Audit</li>
+          <li>Secret / API Key Scanner</li>
+        </ul>
+      </div>
+      <div class="feat-category">
+        <h4>🔧 Developer Tools</h4>
+        <ul>
+          <li>HTTP API Client, Payload Builder</li>
+          <li>Web Scraper Template Generator</li>
+          <li>Proxy & Request Manager</li>
+          <li>Mock Data Generator (16 data types)</li>
+          <li>Dockerfile Generator</li>
+          <li>GitHub Actions CI/CD Generator</li>
+          <li>Python Package Creator</li>
+          <li>Bytecode Viewer, Graphical Execution Profiler</li>
+        </ul>
+      </div>
+      <div class="feat-category">
+        <h4>📁 File & Workspace</h4>
+        <ul>
+          <li>Session Save/Restore (auto-reopens tabs)</li>
+          <li>Multi-file Search</li>
+          <li>Code Diff Viewer, Markdown Live Preview</li>
+          <li>Built-in DB Viewer (SQLite / CSV / JSON)</li>
+          <li>File Watcher, Task Scheduler</li>
+          <li>Bulk File Renamer</li>
+          <li>.env File Manager, Password Vault (encrypted)</li>
+        </ul>
+      </div>
+      <div class="feat-category">
+        <h4>🔀 Git Integration</h4>
+        <ul>
+          <li>Git Panel (commit / push / pull / diff / stash)</li>
+          <li>Git Branch Manager</li>
+          <li>Commit History Viewer</li>
+        </ul>
+      </div>
+      <div class="feat-category">
+        <h4>⚙️ Utilities</h4>
+        <ul>
+          <li>Regex Tester, JSON Formatter/Validator</li>
+          <li>Base64 Encoder/Decoder, Hash Generator</li>
+          <li>Timestamp Converter, UUID Generator</li>
+          <li>Hex Color Picker, Clipboard History</li>
+          <li>Live CPU/RAM Monitor</li>
+          <li>Log File Analyzer, System Info Panel</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UNSPLASH BANNER 4 — Workspace/Developer -->
+<div style="position:relative; z-index:1; width:100%; overflow:hidden; height:260px;">
+  <img src="https://images.unsplash.com/photo-1537432376769-00f5c2f4c8d2?w=1400&q=80&fit=crop" alt="Developer Workspace" style="width:100%; height:260px; object-fit:cover; display:block; opacity:0.35; filter:grayscale(100%);"/>
+  <div style="position:absolute; inset:0; background:linear-gradient(to left, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.4) 60%, rgba(8,8,8,0.85) 100%);"></div>
+  <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:flex-end; padding:0 60px;">
+    <div style="text-align:right;">
+      <p style="font-family:'Share Tech Mono',monospace; font-size:11px; color:#999; letter-spacing:3px; text-transform:uppercase; margin-bottom:10px;">// 430+ Features</p>
+      <h3 style="font-family:'Rajdhani',sans-serif; font-size:clamp(24px,4vw,52px); font-weight:700; color:#fff; line-height:1.1;">Everything in One Place.<br><span style="color:#aaa; font-size:0.65em; font-weight:400;">No extra installs. No plugins. No BS.</span></h3>
+    </div>
+  </div>
+  <div style="position:absolute; bottom:10px; right:14px; font-size:10px; color:rgba(255,255,255,0.2); font-family:'Share Tech Mono',monospace;">Photo: Unsplash</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section id="pricing" class="pricing-section">
+  <div class="container">
+    <span class="section-label">// Pricing</span>
+    <h2 class="section-title">Simple, <span style="color:var(--cyan)">Honest</span> Pricing</h2>
+    <p class="section-desc">Start free. Upgrade when you're ready. No hidden fees, no lock-in.</p>
+
+    <div class="pricing-toggle">
+      <span class="toggle-label active" id="monthly-label">Monthly</span>
+      <div class="toggle-switch" id="billing-toggle" onclick="toggleBilling()">
+        <div class="toggle-knob"></div>
+      </div>
+      <span class="toggle-label" id="annual-label">Annual</span>
+      <span class="save-badge" id="save-badge" style="opacity:0.3">Save 33%</span>
+    </div>
+
+    <div class="pricing-grid reveal">
+      <!-- Free -->
+      <div class="price-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0<span>/mo</span></div>
+        <div class="plan-period">Forever free</div>
+        <ul class="plan-features">
+          <li><span class="ok">✓</span> Full IDE access</li>
+          <li><span class="ok">✓</span> 430+ core features</li>
+          <li><span class="ok">✓</span> 100% offline</li>
+          <li><span class="ok">✓</span> AI Python 2→3 Converter</li>
+          <li><span class="no">–</span> AI Pro features</li>
+          <li><span class="no">–</span> Commercial Protection Suite</li>
+        </ul>
+        <a href="https://mdrabiul.gumroad.com/l/uzrjim" class="plan-btn outline">Get Free →</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="price-card featured">
+        <div class="featured-tag">⚡ Most Popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price" id="pro-price">$15<span>/mo</span></div>
+        <div class="plan-period" id="pro-period">Billed monthly</div>
+        <ul class="plan-features">
+          <li><span class="ok">✓</span> Everything in Free</li>
+          <li><span class="ok">✓</span> All AI Pro features (13+)</li>
+          <li><span class="ok">✓</span> BYOK — GPT-4/Claude/Gemini/Ollama</li>
+          <li><span class="ok">✓</span> Commercial Protection Suite</li>
+          <li><span class="ok">✓</span> Free updates for V15 series</li>
+          <li><span class="ok">✓</span> Priority support</li>
+        </ul>
+        <a href="https://mdrabiul.gumroad.com/l/uzrjim" class="plan-btn primary">Get Pro Now →</a>
+      </div>
+
+      <!-- Business -->
+      <div class="price-card">
+        <div class="plan-name">Business</div>
+        <div class="plan-price" id="biz-price">$60<span>/mo</span></div>
+        <div class="plan-period" id="biz-period">Billed monthly</div>
+        <ul class="plan-features">
+          <li><span class="ok">✓</span> Everything in Pro</li>
+          <li><span class="ok">✓</span> Team licensing</li>
+          <li><span class="ok">✓</span> Multi-machine deployment</li>
+          <li><span class="ok">✓</span> Custom branding options</li>
+          <li><span class="ok">✓</span> Dedicated support</li>
+          <li><span class="ok">✓</span> Early access to new versions</li>
+        </ul>
+        <a href="mailto:hellorabiul2@gmail.com" class="plan-btn outline">Contact Us →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="container">
+    <span class="section-label">// How It Works</span>
+    <h2 class="section-title">Up & Coding in <span style="color:var(--green)">60 Seconds</span></h2>
+
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Purchase</h3>
+        <p>Buy on Gumroad and receive your license key instantly via email.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Double-Click</h3>
+        <p>Download <code style="color:var(--gold)">RevForgeIDE_V15.bat</code> and double-click to launch. No installer needed.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Activate</h3>
+        <p>Enter your license key to activate your plan and unlock all features.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Code</h3>
+        <p>Your full AI-powered Python IDE is ready. Start building immediately.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:48px; padding:24px 32px; background:rgba(240,165,0,0.06); border:1px solid rgba(240,165,0,0.2); border-radius:12px;" class="reveal">
+      <p style="color:var(--gold); font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:600;">⚠️ Requirements</p>
+      <p style="color:var(--muted); font-size:14px; margin-top:8px; line-height:1.7;">
+        Python 3.8–3.13 must be installed on your PC (free from python.org). The IDE auto-detects it — no manual configuration needed. Internet connection required for AI features only.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- UNSPLASH BANNER 5 — Launch/Motivation -->
+<div style="position:relative; z-index:1; width:100%; overflow:hidden; height:300px;">
+  <img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=1400&q=80&fit=crop" alt="Developer launching product" style="width:100%; height:300px; object-fit:cover; display:block; opacity:0.3; filter:grayscale(100%);"/>
+  <div style="position:absolute; inset:0; background:rgba(8,8,8,0.65);"></div>
+  <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; flex-direction:column; gap:20px;">
+    <h3 style="font-family:'Rajdhani',sans-serif; font-size:clamp(32px,6vw,72px); font-weight:700; color:#fff; line-height:1;">Real Tools.<br>Real Automation.<br><span style="color:#ccc;">No Fluff.</span></h3>
+    <a href="https://mdrabiul.gumroad.com/l/uzrjim" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(90deg,#fff,#aaa); color:#000; font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700; padding:14px 36px; border-radius:8px; text-decoration:none; letter-spacing:1px; text-transform:uppercase;">⚡ Get RevForge IDE V15</a>
+  </div>
+  <div style="position:absolute; bottom:10px; right:14px; font-size:10px; color:rgba(255,255,255,0.2); font-family:'Share Tech Mono',monospace;">Photo: Unsplash</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <h2>Real Tools. Real Automation.<br><span style="color:var(--cyan)">No Fluff.</span></h2>
+  <p>Join developers who chose power over complexity.</p>
+  <div class="cta-group">
+    <a href="https://mdrabiul.gumroad.com/l/uzrjim" class="btn-primary">⚡ Get RevForge IDE V15 Now</a>
+    <a href="mailto:hellorabiul2@gmail.com" class="btn-secondary">📧 Partnership Inquiry</a>
+  </div>
+  <p style="margin-top:24px; font-size:13px; color:var(--muted);">Built by RevForge Global | Dhaka, Bangladesh 🇧🇩 &nbsp;|&nbsp; <a href="https://hellorabiul2-netizen.github.io/RevForGe-Global-/" style="color:var(--muted); text-decoration:underline;">🌐 Website</a> &nbsp;|&nbsp; <a href="https://www.youtube.com/@RevForgeGlobal" style="color:var(--muted); text-decoration:underline;">🎥 YouTube</a> &nbsp;|&nbsp; <a href="https://wa.me/8801350058446" target="_blank" style="color:var(--muted); text-decoration:underline;">💬 WhatsApp</a></p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">RevForge <em>Global</em></div>
+  <p>AI-Powered Developer Tools — Built in Bangladesh, Used Worldwide.</p>
+  <p style="margin-top:4px; font-family:'Share Tech Mono', monospace; font-size:12px; color:var(--muted);">hellorabiul2@gmail.com</p>
+  <div class="footer-links">
+    <a href="https://mdrabiul.gumroad.com/l/uzrjim">Gumroad Store</a>
+    <a href="https://hellorabiul2-netizen.github.io/RevForGe-Global-/" target="_blank">🌐 RevForge Global</a>
+    <a href="https://www.youtube.com/@RevForgeGlobal" target="_blank">🎥 YouTube</a>
+    <a href="https://wa.me/8801350058446" target="_blank">💬 WhatsApp</a>
+    <a href="mailto:hellorabiul2@gmail.com">📧 Contact</a>
+  </div>
+  <p style="margin-top:24px; font-size:11px; color:rgba(150,150,150,0.4);">© 2025 RevForge Global. All rights reserved.</p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => observer.observe(r));
+
+  // Billing toggle
+  let isAnnual = false;
+  function toggleBilling() {
+    isAnnual = !isAnnual;
+    const toggle = document.getElementById('billing-toggle');
+    const badge = document.getElementById('save-badge');
+    const mLabel = document.getElementById('monthly-label');
+    const aLabel = document.getElementById('annual-label');
+    
+    toggle.classList.toggle('on', isAnnual);
+    badge.style.opacity = isAnnual ? '1' : '0.3';
+    mLabel.classList.toggle('active', !isAnnual);
+    aLabel.classList.toggle('active', isAnnual);
+
+    document.getElementById('pro-price').innerHTML = isAnnual ? '$10<span>/mo</span>' : '$15<span>/mo</span>';
+    document.getElementById('pro-period').textContent = isAnnual ? 'Billed $120/yr (save $60)' : 'Billed monthly';
+    document.getElementById('biz-price').innerHTML = isAnnual ? '$40<span>/mo</span>' : '$60<span>/mo</span>';
+    document.getElementById('biz-period').textContent = isAnnual ? 'Billed $480/yr (save $240)' : 'Billed monthly';
+  }
+</script>
+</body>
+</html>
